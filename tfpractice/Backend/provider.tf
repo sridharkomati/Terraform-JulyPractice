@@ -5,7 +5,7 @@ provider "aws" {
 
 terraform {
   backend "s3" {
-    bucket = "sss006"
+    bucket = "backendbucket006"
     key    = "backend/state1"
     region = "us-east-1"
     dynamodb_table = "qtsridb"
