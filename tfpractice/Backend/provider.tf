@@ -8,5 +8,6 @@ terraform {
     bucket = "sss006"
     key    = "backend/state1"
     region = "us-east-1"
+    dynamodb_table = "qtsridb"
   }
 }
