@@ -74,24 +74,22 @@ resource "aws_instance" "web" {
   vpc_security_group_ids      = [aws_security_group.sg.id]
 
   connection {
-    type     = "ssh"
-    user     = "ubuntu"
+    type        = "ssh"
+    user        = "ubuntu"
     private_key = file("~/.ssh/id_rsa")
-    host     = aws_instance.web.public_ip
- }
- provisioner "file" {
-  source = "apche2.sh"
-  destination = "/home/ubuntu/apache2.sh"   
- }
+    host        = aws_instance.web.public_ip
+  }
+  provisioner "file" {
+    source      = "apche2.sh"
+    destination = "/home/ubuntu/apache2.sh"
+  }
 
- provisioner "remote-exec" {
-  scripts = [apche2.sh&&awscli.sh]
-  destination = ["/home/ubuntu/apche2.sh&&/home/ubuntu/awscli.sh"] 
+  provisioner "remote-exec" {
+    scripts = ["awscli.sh" , "awsconfig.sh" ,"kubectl.sh"]
 
-   
- }
-  
-   tags = {
+  }
+
+  tags = {
     Name = "first_instance"
   }
 }

@@ -65,39 +65,39 @@ resource "aws_key_pair" "key-pair" {
 
 resource "aws_instance" "web" {
   ami           = data.aws_ami.sri_ami.id
-  instance_type = "t2.micro"
-  user_data     = file("awscli.sh")
+  instance_type = "t2.medium"
   key_name      = "key-gen2"
+  user_data = "nginx.sh"
   subnet_id     = data.aws_subnet.web.id
   ##subnet_id = aws_subnet.sri_sub[0].id
   associate_public_ip_address = true
   vpc_security_group_ids      = [aws_security_group.sg.id]
 
-  connection {
-    type     = "ssh"
-    user     = "ubuntu"
-    private_key = file("~/.ssh/id_rsa")
-    host     = aws_instance.web.public_ip
- }
- provisioner "file" {
-  source = "apche2.sh"
-  destination = "/home/ubuntu/apache2.sh"   
- }
-
- provisioner "remote-exec" {
-  scripts = [apche2.sh&&awscli.sh]
-  destination = ["/home/ubuntu/apche2.sh&&/home/ubuntu/awscli.sh"] 
-
-   
- }
-  
-   tags = {
-    Name = "first_instance"
+  tags = {
+    Name = "NULL_instance"
   }
 }
 
 output "url" {
   value = aws_instance.web.public_ip
+}
+resource "null_resource" "null" {
+  triggers = {
+    version_sri = var.version_sri
+  }
+  connection {
+    type        = "ssh"
+    user        = "ubuntu"
+    private_key = file("~/.ssh/id_rsa")
+    host        = aws_instance.web.public_ip
+  }
+  provisioner "remote-exec" {
+    inline = [ 
+      "sudo apt update",
+      "sudo apt install apache2 -y",
+    ]
+
+  }
 }
 
 

@@ -1,6 +1,6 @@
 variable "region" {
   type    = string
-  default = "us-west-2"
+  default = "us-east-2"
 
 }
 
@@ -18,7 +18,7 @@ variable "sri_vpc_info" {
     subnet_names    = ["web1", "web2", "app1", "app2", "db1", "db2"]
     public_subnets  = ["web1", "web2"]
     private_subnets = ["app1", "app2", "db1", "db2"]
-    subnet_azs      = ["a", "b", "a", "b", "a", "b"]
+    subnet_azs      = ["a", "b", "c", "a", "b", "c"]
     ec2_subnet      = "web2"
   }
 

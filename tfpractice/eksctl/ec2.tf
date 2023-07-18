@@ -65,7 +65,7 @@ resource "aws_key_pair" "key-pair" {
 
 resource "aws_instance" "web" {
   ami           = data.aws_ami.sri_ami.id
-  instance_type = "t2.micro"
+  instance_type = "t2.medium"
   user_data     = file("awscli.sh")
   key_name      = "key-gen2"
   subnet_id     = data.aws_subnet.web.id
@@ -74,25 +74,37 @@ resource "aws_instance" "web" {
   vpc_security_group_ids      = [aws_security_group.sg.id]
 
   connection {
-    type     = "ssh"
-    user     = "ubuntu"
+    type        = "ssh"
+    user        = "ubuntu"
     private_key = file("~/.ssh/id_rsa")
-    host     = aws_instance.web.public_ip
- }
- provisioner "file" {
-  source = "apche2.sh"
-  destination = "/home/ubuntu/apache2.sh"   
- }
+    host        = aws_instance.web.public_ip
+  }
 
- provisioner "remote-exec" {
-  scripts = [apche2.sh&&awscli.sh]
-  destination = ["/home/ubuntu/apche2.sh&&/home/ubuntu/awscli.sh"] 
+  provisioner "file" {
+    source = "cluster.yaml"
+    destination = "/home/ubuntu/cluster.yaml"
+     
+  }
+  provisioner "file" {
+    source = "key.sh"
+    destination = "/home/ubuntu/.ssh/id_rsa.pub"
+  }
+  provisioner "remote-exec" {
+    inline = [ 
+      "curl -O https://s3.us-west-2.amazonaws.com/amazon-eks/1.27.1/2023-04-19/bin/linux/amd64/kubectl",
+      "chmod +x ./kubectl",
+      "mkdir -p $HOME/bin && cp ./kubectl $HOME/bin/kubectl && export PATH=$HOME/bin:$PATH",
+      "curl --silent --location https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz | tar xz -C /tmp",
+      "sudo mv /tmp/eksctl /usr/local/bin",
+      "eksctl version",
+    ]
 
-   
- }
+  }
+ 
   
-   tags = {
-    Name = "first_instance"
+
+  tags = {
+    Name = "eksctl_instance"
   }
 }
 
